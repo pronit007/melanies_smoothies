@@ -44,11 +44,8 @@ ingredients_list = st.multiselect(
 )
 
 # Process selected ingredients
+# Process selected ingredients
 if ingredients_list:
-
-    ingredients_string = ""
-
-    if ingredients_list:
 
     ingredients_string = ""
 
@@ -67,15 +64,11 @@ if ingredients_list:
             + fruit_chosen.lower()
         )
 
-        # Display API response
+        # Display nutrition data
         sf_df = st.dataframe(
             data=smoothiefroot_response.json(),
             use_container_width=True
         )
-
-        
-        
-        
 
     # Create INSERT statement
     my_insert_stmt = """INSERT INTO smoothies.public.orders
@@ -93,5 +86,3 @@ if ingredients_list:
             "Your Smoothie is ordered, " + name_on_order + "!",
             icon="✅"
         )
-
-
