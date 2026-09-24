@@ -30,9 +30,13 @@ my_dataframe = (
         col("SEARCH_ON")
     )
 )
+#st.dataframe(date=my_dataframe,use_container_width=True)
+#st.stop()
 
 # Convert Snowpark DataFrame to Pandas DataFrame
 pd_df = my_dataframe.to_pandas()
+st.dataframe(date=my_dataframe,use_container_width=True)
+st.stop()
 
 # Select up to 5 fruits
 ingredients_list = st.multiselect(
@@ -51,20 +55,16 @@ if ingredients_list:
         ingredients_string += fruit_chosen + " "
 
         # Get API search value
-        search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen,'SEARCH_ON'].iloc[0]
-       # st.write('The search value for',fruit_chosen, ' is ',search_on,',')
+        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+        #st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
+       
 
         # Display nutrition information
         st.subheader(fruit_chosen + 'Nutrition Information')
 
-        fruityvice_response = requests.get(f
-            "https://my.smoothiefroot.com/api/fruit/{search_on}"
-        )
+        fruityvice_response = requests.get(f"https://my.smoothiefroot.com/api/fruit/{search_on}")
 
-        sf_df = st.dataframe(
-            data=fruityvice_response.json(),
-            use_container_width=True
-        )
+        sf_df = st.dataframe( data=fruityvice_response.json(), use_container_width=True )
 
     # Create INSERT statement
     my_insert_stmt = """INSERT INTO smoothies.public.orders
