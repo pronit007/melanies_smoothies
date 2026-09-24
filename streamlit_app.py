@@ -22,28 +22,25 @@ st.write(
 cnx = st.connection("snowflake")
 session = cnx.session()
 
-# Get fruit names from Snowflake
+# Get fruit names and API search values from Snowflake
 my_dataframe = (
     session.table("smoothies.public.fruit_options")
-    .select(col("FRUIT_NAME"))
+    .select(
+        col("FRUIT_NAME"),
+        col("SEARCH_ON")
+    )
 )
 
-# Convert Snowflake rows into a Python list
-fruit_rows = my_dataframe.collect()
-
-fruit_options = [
-    row["FRUIT_NAME"]
-    for row in fruit_rows
-]
+# Convert Snowpark DataFrame to Pandas DataFrame
+pd_df = my_dataframe.to_pandas()
 
 # Select up to 5 fruits
 ingredients_list = st.multiselect(
     "Choose up to 5 ingredients:",
-    fruit_options,
+    pd_df["FRUIT_NAME"].tolist(),
     max_selections=5
 )
 
-# Process selected ingredients
 # Process selected ingredients
 if ingredients_list:
 
@@ -53,20 +50,29 @@ if ingredients_list:
 
         ingredients_string += fruit_chosen + " "
 
+        # Get API search value
+        search_on = pd_df.loc[
+            pd_df["FRUIT_NAME"] == fruit_chosen,
+            "SEARCH_ON"
+        ].iloc[0]
+
+        st.write(
+            "The search value for",
+            fruit_chosen,
+            "is",
+            search_on,
+            "."
+        )
+
         # Display nutrition information
-        st.subheader(
-            fruit_chosen + " Nutrition Information"
+        st.subheader(fruit_chosen + " Nutrition Information")
+
+        fruityvice_response = requests.get(
+            "https://fruityvice.com/api/fruit/" + search_on
         )
 
-        # Call SmoothieFroot API
-        smoothiefroot_response = requests.get(
-            "https://my.smoothiefroot.com/api/fruit/"
-            + fruit_chosen.lower()
-        )
-
-        # Display nutrition data
         sf_df = st.dataframe(
-            data=smoothiefroot_response.json(),
+            data=fruityvice_response.json(),
             use_container_width=True
         )
 
