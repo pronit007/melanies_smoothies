@@ -35,7 +35,7 @@ my_dataframe = (
 
 # Convert Snowpark DataFrame to Pandas DataFrame
 pd_df = my_dataframe.to_pandas()
-st.dataframe(date=my_dataframe,use_container_width=True)
+st.dataframe(data=my_dataframe,use_container_width=True)
 st.stop()
 
 # Select up to 5 fruits
